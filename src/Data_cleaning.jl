@@ -1,21 +1,6 @@
 # This is code to replicate the outputs from the article "Immigration Restrictions as Active Labor Market Policy:
 # Evidence from the Mexican Bracero Exclusion" (2018) by Michael A. Clemens, Ethan G. Lewis, and Hannah M. Postel. 
 
-cd("/Users/glpou/GitHub/bracero_pkg")
-
-############################### Cleaning ############################### 
-
-using Pkg
-Pkg.add("FileIO")
-Pkg.add("StatFiles")
-Pkg.add("DataFrames")
-Pkg.add("CSV")
-Pkg.add("Dates")
-Pkg.add("Statistics")
-Pkg.add("ReadStatTables")
-Pkg.add("ReadStat")
-Pkg.add("PanelDataTools")
-
 using StatFiles
 using CSV
 using DataFrames
@@ -25,7 +10,7 @@ using ReadStatTables
 using ReadStat
 using PanelDataTools
 
-include("Misc.jl")
+include("Functions.jl")
 
 df = CSV.read("data/raw/data_bracero_aer.csv", DataFrame)
 sort!(df, [:State, :Year])  # Sort the DataFrame by State and Year columns
@@ -93,7 +78,10 @@ dfm = leftjoin(df, df1, on = [:State_FIPS, :time_m])
 # Price adjustment and real wage calculations
 dfm.priceadjust .= dfm.cpi ./ 0.1966401  # Divide by the value of the index in January 1965
 dfm.realwage_daily .= dfm.DailywoBoard_final ./ dfm.priceadjust
+dfm.realwage_daily1 = coalesce.(dfm.realwage_daily, 0)
+
 dfm.realwage_hourly .= dfm.HourlyComposite_final ./ dfm.priceadjust
+dfm.realwage_hourly1 = coalesce.(dfm.realwage_hourly, 0)
 
 # Drop columns
 select!(dfm, Not([:cpi, :priceadjust]))
@@ -102,8 +90,29 @@ select!(dfm, Not([:cpi, :priceadjust]))
 sort!(dfm, [:State, :time_m])
 
 # Generate the row totals for domestic seasonal workers
-dfm[:, :domestic_seasonal] = sum.(eachrow(df[:, [:Local_final, :Intrastate_final, :Interstate_final]]))
+# Store original values as separate columns
+dfm[!, :Local_orig] .= dfm.Local_final
+dfm[!, :Intrastate_orig] .= dfm.Intrastate_final
+dfm[!, :Interstate_orig] .= dfm.Interstate_final
+
+# Replace values with 0 if Local_orig is missing
+dfm.Local_orig[ismissing.(dfm.Local_orig)] .= 0
+dfm.Intrastate_orig[ismissing.(dfm.Local_orig)] .= 0
+dfm.Interstate_orig[ismissing.(dfm.Local_orig)] .= 0
+
+# Replace values with missing if Year is outside the valid range or conditions
+dfm.Local_orig .= ifelse.((dfm.Year .< 1954) .| (dfm.Year .> 1973) .| ((dfm.Year .== 1973) .& (dfm.Month .> 7)), missing, dfm.Local_orig)
+dfm.Intrastate_orig .= ifelse.((dfm.Year .< 1954) .| (dfm.Year .> 1973) .| ((dfm.Year .== 1973) .& (dfm.Month .> 7)), missing, dfm.Intrastate_orig)
+dfm.Interstate_orig .= ifelse.((dfm.Year .< 1954) .| (dfm.Year .> 1973) .| ((dfm.Year .== 1973) .& (dfm.Month .> 7)), missing, dfm.Interstate_orig)
+
+# Rowtotals
+dfm[!, [:Local_final, :Intrastate_final, :Interstate_final]] .= coalesce.(dfm[:, [:Local_final, :Intrastate_final, :Interstate_final]], 0)
+dfm[:, :domestic_seasonal] = sum.(eachrow(dfm[:, [:Local_final, :Intrastate_final, :Interstate_final]])) 
+
 dfm.ln_domestic_seasonal .= (dfm.domestic_seasonal .> 0) .* log.(dfm.domestic_seasonal)
+dfm.ln_domestic_seasonal = Union{Missing, Float64}[dfm.ln_domestic_seasonal...]
+dfm.ln_domestic_seasonal[dfm.domestic_seasonal .== 0] .= missing
+
 dfm.ln_foreign .= (dfm.TotalForeign_final .> 0) .* log.(dfm.TotalForeign_final)
 
 # Generate fractions
@@ -112,8 +121,16 @@ dfm.for_frac .= dfm.TotalForeign_final ./ dfm.TotalHiredSeasonal_final
 
 # Generate log for specific categories
 dfm.ln_local .= (dfm.Local_final .> 0) .* log.(dfm.Local_final)
+dfm.ln_local = Union{Missing, Float64}[dfm.ln_local...]
+dfm.ln_local[dfm.Local_final .== 0] .= missing
+
 dfm.ln_intrastate .= (dfm.Intrastate_final .> 0) .* log.(dfm.Intrastate_final)
+dfm.ln_intrastate = Union{Missing, Float64}[dfm.ln_intrastate...]
+dfm.ln_intrastate[dfm.Intrastate_final .== 0] .= missing
+
 dfm.ln_interstate .= (dfm.Interstate_final .> 0) .* log.(dfm.Interstate_final)
+dfm.ln_interstate = Union{Missing, Float64}[dfm.ln_interstate...]
+dfm.ln_interstate[dfm.Interstate_final .== 0] .= missing
 
 # Replace values for domestic seasonal workers if year is outside the specified range
 dfm.domestic_seasonal .= ifelse.((dfm.Year .< 1954) .| (dfm.Year .> 1973) .| ((dfm.Year .== 1973) .& (dfm.Month .> 7)), missing, dfm.domestic_seasonal)
@@ -148,8 +165,13 @@ dfm_1.treatment_frac = dfm_1.post .* dfm_1.mex_frac_55 # Create 'treatment_frac'
 dfm_1.post_2 = dfm_1.Year .>= 1962              # Create 'post_2' column
 dfm_1.treatment_frac_2 = dfm_1.post_2 .* dfm_1.mex_frac_55  # Create 'treatment_frac_2' column
 
-dfm_1.ln_realwage_hourly .= (dfm_1.realwage_hourly .> 0) .* log.(dfm_1.realwage_hourly)
-dfm_1.ln_realwage_daily .= (dfm_1.realwage_daily .> 0) .* log.(dfm_1.realwage_daily)
+dfm_1.ln_realwage_hourly .= (dfm_1.realwage_hourly1 .> 0) .* log.(dfm_1.realwage_hourly1)
+dfm_1.ln_realwage_hourly = Union{Missing, Float64}[dfm_1.ln_realwage_hourly...]
+dfm_1.ln_realwage_hourly[dfm_1.realwage_hourly1 .== 0] .= missing
+
+dfm_1.ln_realwage_daily .= (dfm_1.realwage_daily1 .> 0) .* log.(dfm_1.realwage_daily1)
+dfm_1.ln_realwage_daily = Union{Missing, Float64}[dfm_1.ln_realwage_daily...]
+dfm_1.ln_realwage_daily[dfm_1.realwage_daily1 .== 0] .= missing
 
 dfm_1.farm_tot_57 = ifelse.(dfm_1.Year .== 1957, dfm_1.Farmworkers_Hired * 1000, missing)
 
@@ -167,6 +189,8 @@ rename!(dfm_2, :m_farm_tot_57 => :farm_tot_57)
 dfm_2.none = (.!ismissing.(dfm_2.mex_frac_55)) .& (dfm_2.mex_frac_55 .== 0)
 dfm_2.low = (.!ismissing.(dfm_2.mex_frac_55)) .& (dfm_2.mex_frac_55 .> 0) .& (dfm_2.mex_frac_55 .< 0.2)
 dfm_2.high = (.!ismissing.(dfm_2.mex_frac_55)) .& (dfm_2.mex_frac_55 .>= 0.2)
+
+sort!(dfm_2, [:State_FIPS, :time_m])
 
 CSV.write("Data/clean/data_cleaned.csv", dfm_2)
 ## END ##
