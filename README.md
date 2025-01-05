@@ -33,11 +33,11 @@ The files are named after their respective purposes. *Data_cleaning.jl* cleans t
 
 ## Instructions for replication
 1. Go to your computer's terminal.
-2. Enter: `git clone https://github.com/vivansharma2/CLP2018.jl`
-3. Enter: `cd CLP2018.jl`
+2. Enter: `git clone https://github.com/glpousse/bracero_pkg.jl`
+3. Enter: `cd bracero_pkg.jl`
 4. Go to the Julia REPL.
-5. Enter: `using CLP2018`
-6. Enter: `CLP2018.run()`
+5. Enter: `using bracero_pkg`
+6. Enter: `bracero_pkg.run()`
 7. This should run all of the code and produce all of the output.
 
 ## Notes on replication
