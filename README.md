@@ -28,11 +28,10 @@ The original code was in STATA, and can be found [here](https://www.openicpsr.or
     - PrettyTables
     - CategoricalArrays
 
-To ensure the above packages are installed, you can use this code: 
+To ensure the above packages are installed, enter the Julia package mode with the `]` command, followed by: 
 
 ```julia
-julia> ]
-julia> add Test HypothesisTests Statistics Plots StatFiles CSV DataFrames Dates ReadStatTables ReadStat PanelDataTools FixedEffectModels GLM RegressionTables Distributions PrettyTables CategoricalArrays
+add Test HypothesisTests Statistics Plots StatFiles CSV DataFrames Dates ReadStatTables ReadStat PanelDataTools FixedEffectModels GLM RegressionTables Distributions PrettyTables CategoricalArrays
 ```
 
 ## Scripts
