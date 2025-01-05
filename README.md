@@ -31,8 +31,8 @@ The original code was in STATA, and can be found [here](https://www.openicpsr.or
 To ensure the above packages are installed, you can use this code: 
 
 ```julia
-> ]
-> add Test HypothesisTests Statistics Plots StatFiles CSV DataFrames Dates ReadStatTables ReadStat PanelDataTools FixedEffectModels GLM RegressionTables Distributions PrettyTables CategoricalArrays
+julia> ]
+julia> add Test HypothesisTests Statistics Plots StatFiles CSV DataFrames Dates ReadStatTables ReadStat PanelDataTools FixedEffectModels GLM RegressionTables Distributions PrettyTables CategoricalArrays
 ```
 
 ## Scripts
