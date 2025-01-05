@@ -1,5 +1,6 @@
 ## Reproducing Table 1
 
+using CategoricalArrays
 using DataFrames
 using CSV
 using FixedEffectModels
