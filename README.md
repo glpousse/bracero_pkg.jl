@@ -35,10 +35,16 @@ The files are named after their respective purposes. *Data_cleaning.jl* cleans t
 1. Go to your computer's terminal.
 2. Enter: `git clone https://github.com/glpousse/bracero_pkg.jl`
 3. Enter: `cd bracero_pkg.jl`
-4. Go to the Julia REPL.
-5. Enter: `using bracero_pkg`
-6. Enter: `bracero_pkg.run()`
-7. This should run all of the code and produce all of the output.
+4. Open the Julia REPL.
+5. Enter:
+   ```julia
+   using Pkg
+   Pkg.activate(".")
+   Pkg.instantiate()
+   ```
+6. Enter: `using bracero_pkg`
+7. Enter: `bracero_pkg.run()`
+8. This should run all of the code and produce all of the output.
 
 ## Notes on replication
 For the most part, we were able to fully replicate the main findings of the paper. We had discrepancies in Table 2, most probably originating from how we dealt with missing values. We observed that the authors of the paper generated a variable *domestic_seasonal* as the rowtotal of three other variables. They defined it such that it took the value 0 if all three inputs were missing and added whatever values were available, even if one or two of the others were missing. They converted all observations outside of a certain time frame to missings. We believe that this is a problematic approach, and can bias the estimates from the regression. While there will be a loss in explanatory power, the regression results could change significantly if we turned the zeros summed from missing inputs into missing values. Perhaps this could warrant further discussion into the matter.
