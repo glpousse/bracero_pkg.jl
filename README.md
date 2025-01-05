@@ -28,12 +28,6 @@ The original code was in STATA, and can be found [here](https://www.openicpsr.or
     - PrettyTables
     - CategoricalArrays
 
-To ensure the above packages are installed, enter the Julia package mode with the `]` command, followed by: 
-
-```julia
-add Test HypothesisTests Statistics Plots StatFiles CSV DataFrames Dates ReadStatTables ReadStat PanelDataTools FixedEffectModels GLM RegressionTables Distributions PrettyTables CategoricalArrays
-```
-
 ## Scripts
 The files are named after their respective purposes. *Data_cleaning.jl* cleans the raw data and exports the cleaned csv.'s to the output folder. *Table1.jl, Table2.jl, Table3.jl* all produce regression tables by the same number as in the paper. Similarly, *Figure2.jl, Figure3.jl* do the same for the graphs. *Functions.jl* is a script wherein intermediate functions are defined. These functions are used in several of the other scripts. Lastly, *CLP2018.jl* is the main file of interest - it defines the package.
 
