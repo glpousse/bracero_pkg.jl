@@ -1,5 +1,5 @@
 # Replication exercise for Computational Economics
-Authors: Guillaume POUSSE, Morgane SOUFFLET, Vivan SHARMA
+Author: Guillaume POUSSE
 
 ## Overview and Data Availability
 This is the ReadMe for a replication of Clemens, Lews & Postel, "Immigration Restrictions as Active Labor Market Policy: Evidence from the Mexican Bracero Exclusion." (2018). The citation can be found below. 
