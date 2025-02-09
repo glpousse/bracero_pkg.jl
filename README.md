@@ -1,5 +1,5 @@
 # Replication exercise for Computational Economics
-Author: Guillaume POUSSE
+Authors: Guillaume POUSSE, Vivan SHARMA
 
 ## Overview and Data Availability
 This is the ReadMe for a replication of Clemens, Lews & Postel, "Immigration Restrictions as Active Labor Market Policy: Evidence from the Mexican Bracero Exclusion." (2018). The citation can be found below. 
@@ -47,7 +47,7 @@ The files are named after their respective purposes. *Data_cleaning.jl* cleans t
 8. This should run all of the code and produce all of the output.
 
 ## Notes on replication
-For the most part, I was able to fully replicate the main findings of the paper. There are discrepancies in Table 2, most likely due to how missing values were dealth with. In their STATA code, the authors generate a variable *domestic_seasonal* as the rowtotal of three other variables. They defined it such that it took the value 0 if all three inputs were missing and added whatever values were available, even if one or two of the others were missing. They converted all observations outside of a certain time frame to missings. This may be a problematic approach, and can bias the estimates from the regression. While there will be a loss in explanatory power, the regression results could change significantly if we turned the zeros summed from missing inputs into missing values. This perhaps warrants further research.
+For the most part, we were able to fully replicate the main findings of the paper. There are discrepancies in Table 2, most likely due to how missing values were dealth with. In their STATA code, the authors generate a variable *domestic_seasonal* as the rowtotal of three other variables. They defined it such that it took the value 0 if all three inputs were missing and added whatever values were available, even if one or two of the others were missing. They converted all observations outside of a certain time frame to missings. This may be a problematic approach, and can bias the estimates from the regression. While there will be a loss in explanatory power, the regression results could change significantly if we turned the zeros summed from missing inputs into missing values. This perhaps warrants further research.
 
 Also, Table 1 is split into two halves; the first half is exported to a .txt file, and the second half is printed on the screen when the code is run. The second half contains the information on semi-elasticities seen in the paper.
 
